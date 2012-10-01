@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AUTHOR: Oleg B
+# AUTHOR: Oleg Brodkin
 #
 # DATE:   Sep-28-2012
 #
@@ -40,23 +40,17 @@ do
 
     echo -en "#---"$name
 
-    if ( `ping -c 4 -q ${ip%%+*} > /dev/null` ) 
-    then
-	echo -en " --- LIVE"
-    else
-	echo -en " --- OFFLINE"
-    fi
+    # if ping fails, echo OFFLINE will erase ONLINE
+    echo -en " --ONLINE"
+    ( `ping -c 4 -q ${ip%%+*} > /dev/null` ) || ( echo -en "\033[6DOFFLINE" )
+    wait
+ 
+    # if dig failes, echo NODNS will erase INDNS
+    echo -en " --INDNS"
+    ( `dig "${dns%%+*}" | grep -q "${ip%%+*}" > /dev/null` ) || ( echo -en "\033[5DNODNS")
     wait
 
-    if ( `dig "${dns%%+*}" | grep -q "${ip%%+*}" > /dev/null` ) 
-    then
-	echo -e " --- IN DNS "
-    else
-	echo -e " --- NO DNS"
-    fi
-    wait
-
-    echo "cobbler system add --name="${name}" --hostname="${host}"  \
+    echo -e "\ncobbler system add --name="${name}" --hostname="${host}"  \
 --dns-name="${dns%%+*}" --profile="${COBBLER_DEFAULT_PROFILE}" \
 --netboot-enabled=0 --mac="${mac%%+*}" --ip-address="${ip%%+*}
     echo "wait"
