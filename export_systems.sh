@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AUTHOR: Oleg Brodkin
+# AUTHOR: Oleg B
 #
 # DATE:   Sep-28-2012
 #
