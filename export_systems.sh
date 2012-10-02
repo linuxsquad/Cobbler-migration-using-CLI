@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# AUTHOR: Oleg Brodkin
+# AUTHOR: Oleg B
 #
 # DATE:   Sep-28-2012
 #
@@ -24,6 +24,8 @@
 #                 and whether its HOSTNAME exists in DNS
 #
 
+source ./pinglib_inc.sh
+
 readonly TEMPFILE="/tmp/cobbler_system.txt"
 readonly COBBLER_DEFLT_PROFILE="xubuntu12.04_WS"
 
@@ -38,32 +40,23 @@ do
     mac=`cat $TEMPFILE | awk -F " : " '/mac address/{print $2"+"}' `
     ip=`cat $TEMPFILE | awk -F " : " '/ip address/{print $2"+"}' `
 
-    echo -en "#---"$name
+    echo -en "#---"$name" --"
 
-    # if ping fails, echo OFFLINE will erase ONLINE
-    echo -en " --ONLINE"
-    ( `ping -c 4 -q ${ip%%+*} > /dev/null` ) || ( echo -en "\033[6DOFFLINE" )
-    wait
+    onlineStatus "${ip%%+*}" "${dns%%+*}"
  
-    # if dig failes, echo NODNS will erase INDNS
-    echo -en " --INDNS"
-    ( `dig "${dns%%+*}" | grep -q "${ip%%+*}" > /dev/null` ) || ( echo -en "\033[5DNODNS")
-    wait
-
     echo -e "\ncobbler system add --name="${name}" --hostname="${host}"  \
 --dns-name="${dns%%+*}" --profile="${COBBLER_DEFAULT_PROFILE}" \
---netboot-enabled=0 --mac="${mac%%+*}" --ip-address="${ip%%+*}
-    echo "wait"
+--netboot-enabled=0 --mac="${mac%%+*}" --ip-address="${ip%%+*}"; wait"
 
+    #
+    # checking whether node has 2nd interface
     if [ "X${interface#*+}" != "X" ] 
     then
 	interface2=${interface#*+?}
 	mac2=${mac#*+?}
 	ip2=${ip#*+?}
-	    echo "cobbler system edit --name="${name}" --interface="${interface2%+}" \
---mac="${mac2%+}"  --ip-address="${ip2%+}
-	    echo "wait"
-
+	    echo -e "cobbler system edit --name="${name}" --interface="${interface2%+}" \
+--mac="${mac2%+}"  --ip-address="${ip2%+}"; wait"
     fi
 
 done
