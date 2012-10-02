@@ -10,7 +10,7 @@ function onlineStatus() {
        return 1
    fi
 
-   host=$1
+   local host=$1
 
    if ( `ping -c 4 -q ${host} > /dev/null` ) 
    then
@@ -25,7 +25,7 @@ function onlineStatus() {
        return 0
    fi
 
-   dns=$2
+   local dns=$2
 
    if ( `dig "${dns}" | grep -q "${host}" > /dev/null` )
    then
