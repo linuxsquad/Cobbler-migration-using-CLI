@@ -52,7 +52,7 @@ do
 	onlineStatus ${host}"."${MAINDOMAIN}
     fi
 
-    echo -e "\n ipa dnsrecord-add "${MAINDOMAIN}" "${host}" --cname-rec "${cname}"; wait"
+    echo -e "\n ipa dnsrecord-add "${MAINDOMAIN}" "${cname}" --cname-rec "${host}"; wait"
 
 done
 
